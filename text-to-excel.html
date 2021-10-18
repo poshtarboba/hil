@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Текст в Ексель</title>
+<style>
+	body { font-family: sans-serif; }
+	button { float: right; cursor: pointer; }
+	textarea { box-sizing: border-box; resize: none; width: 100%; height: 70vh; }
+</style>
+<body>
+	<h1>Текст в Ексель</h1>
+	<button>Копіювати все</button>
+	<p>Вставте в поле текст. Всі вертикальні риски будуть замінені на символ табуляції для вставки в Excel. Також всі англійські літери "і" будуть змінені на відповідні українські, російські російські "э" на "є"; всі слова, набрані великими літерами, перетворені на "Перша велика, далі - маленькі".</p>
+	<textarea></textarea>
+	<script>
+		const reg = /[а-я'іїєґъы]/i;
+		const textarea = document.querySelector('textarea');
+		const button = document.querySelector('button');
+		textarea.addEventListener('input', textareaInput);
+		button.addEventListener('click', copyToClipboard);
+		
+		function textareaInput(){
+			let val = textarea.value;
+			val = val.replace(/ *\| */g, '\t').replace(/`/g, "'").replace(/I/g, 'І').replace(/i/g, 'і').replace(/Э/g, 'Є').replace(/э/g, 'є');
+			for (let i = 1; i < val.length; i++) {
+				if (reg.test(val[i - 1])) val = val.substr(0, i) + val[i].toLowerCase() + val.substr(i + 1);
+			}
+			textarea.value = val;
+		}
+		
+		function copyToClipboard(){
+			textarea.focus();
+			textarea.setSelectionRange(0, textarea.value.length);
+			document.execCommand('copy');
+		}
+	</script>
+</body>
+</html>

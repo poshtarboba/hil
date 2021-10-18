@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Порівняння списків</title>
+<style>
+	body { font-family: sans-serif; }
+	table p { margin: 0; }
+	textarea { font-family: sans-serif; box-sizing: border-box; resize: none; width: 100%; height: 150px; }
+	label { cursor: pointer; user-select: none; }
+	small { opacity: 0.5; font-style: italic; }
+	.right { float: right; }
+</style>
+<body>
+	<a class="right" href="index.html">Інші інструменти</a>
+	<h1>Порівняння списків</h1>
+	<p>
+		Вставте в ліве і праве поля списки. Під полями будуть відображатися розбіжності. Пусті строки не враховуються. Пробіли* на початку, в кінці кожної строки і зайві між словами - не враховуються. Результати сортуються за алфавітом.
+		<br>
+		<small>*) пробіли, нерозривні пробіли, символи табуляції</small>
+	</p>
+	<p><label><input type="checkbox" id="cb" checked> Порівняння без врахування великих і малих літер.</label></p>
+	<table width="100%">
+		<tbody>
+			<tr>
+				<td><textarea id="t1"></textarea></td>
+				<td><textarea id="t2"></textarea></td>
+			</tr>
+			<tr>
+				<td><b>Відсутні у правій колонці:</b><br>&nbsp;</td>
+				<td><b>Відсутні у лівій колонці:</b><br>&nbsp;</td>
+			</tr>
+			<tr>
+				<td id="r1" valign="top">...</td>
+				<td id="r2" valign="top">...</td>
+			</tr>
+		</tbody>
+	</table>
+	<script>
+		const cb = document.getElementById('cb');
+		const t1 = document.getElementById('t1');
+		const t2 = document.getElementById('t2');
+		const r1 = document.getElementById('r1');
+		const r2 = document.getElementById('r2');
+		cb.addEventListener('change', compare);
+		t1.addEventListener('input', compare);
+		t2.addEventListener('input', compare);
+		
+		function compare() {
+			let res1 = [], res2 = [];
+			let list1 = createList(t1.value);
+			let list2 = createList(t2.value);
+			compareLists(list1, list2, res1);
+			compareLists(list2, list1, res2);
+			r1.innerHTML = createHTML(res1) || '...';
+			r2.innerHTML = createHTML(res2) || '...';
+			
+		}
+		function createList(str) {
+			let res =  str.split('\n').map(s => s.trim().replace(/\s+/g, ' '));
+			let i = 0;
+			while (i < res.length) {
+				if (!res[i] || res[i] === ' ') res.splice(i, 1);
+				else i++;
+			}
+			return res;
+		}
+		function compareStr(s1, s2) {
+			if (cb.checked) {
+				s1 = s1.toLowerCase();
+				s2 = s2.toLowerCase();
+			}
+			return s1 === s2;
+		}
+		function compareLists(list1, list2, res) {
+			list1.forEach(item => {
+				let cmp = false;
+				for (let i = 0; i < list2.length; i++) {
+					if (compareStr(item, list2[i])) cmp = true;
+				}
+				if (!cmp) res.push(item);
+			});
+		}
+		function createHTML(list) {
+			return list.sort((a, b) => a.localeCompare(b, 'uk')).join('<br>');
+		}
+	</script>
+</body>
+</html>
